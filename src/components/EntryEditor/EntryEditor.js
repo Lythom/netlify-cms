@@ -6,6 +6,7 @@ import { ScrollSync, ScrollSyncPane } from '../ScrollSync';
 import ControlPane from '../ControlPanel/ControlPane';
 import PreviewPane from '../PreviewPane/PreviewPane';
 import Toolbar from './EntryEditorToolbar';
+import { StickyContext } from '../UI/Sticky/Sticky';
 import styles from './EntryEditor.css';
 import stickyStyles from '../UI/Sticky/Sticky.css';
 
@@ -36,35 +37,6 @@ class EntryEditor extends Component {
     localStorage.setItem(PREVIEW_VISIBLE, newPreviewVisible);
   };
 
-  setSticky = (contextTop, containerRect, sticky) => {
-    if (contextTop >= containerRect.top) {
-      if (contextTop < containerRect.bottom - 60) {
-        sticky.classList.add(stickyStyles.top);
-        sticky.classList.remove(stickyStyles.bottom);
-      } else if (contextTop >= containerRect.bottom - 60) {
-        sticky.classList.remove(stickyStyles.top);
-        sticky.classList.add(stickyStyles.bottom);
-      }
-    } else {
-      sticky.classList.remove(stickyStyles.top);
-      sticky.classList.remove(stickyStyles.bottom);
-    }
-  };
-
-  handleControlPaneRef = (ref) => {
-    const sticky = ref.querySelector('.cms__index__editorControlBar');
-    const stickyContainer = ref.querySelector('.stickyContainer');
-    stickyContainer.style.paddingTop = `${ sticky.offsetHeight }px`;
-    sticky.style.position = 'absolute';
-    sticky.style.top = `${ -sticky.offsetHeight }px`;
-    sticky.style.width = `${ stickyContainer.getBoundingClientRect().width }px`;
-
-    ref && ref.addEventListener('scroll', (e) => {
-      const contextTop = e.target.getBoundingClientRect().top;
-      this.setSticky(contextTop, stickyContainer.getBoundingClientRect(), sticky);
-    });
-  };
-
   render() {
     const {
         collection,
@@ -84,7 +56,7 @@ class EntryEditor extends Component {
     const previewClassName = `${ styles.previewPane } ${ this.state.showEventBlocker && styles.blocker }`;
 
     const editor = (
-      <div className={controlClassName} ref={this.handleControlPaneRef}>
+      <StickyContext className={controlClassName}>
         <Button className={styles.previewToggle} onClick={this.handleTogglePreview}>Toggle Preview</Button>
         <ControlPane
           collection={collection}
@@ -99,7 +71,7 @@ class EntryEditor extends Component {
           onRemoveAsset={onRemoveAsset}
           ref={c => this.controlPaneRef = c} // eslint-disable-line
         />
-      </div>
+      </StickyContext>
     );
 
     const editorWithPreview = (
