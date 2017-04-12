@@ -60,7 +60,7 @@ class EntryEditor extends Component {
     const previewClassName = `${ styles.previewPane } ${ this.state.showEventBlocker && styles.blocker }`;
 
     const editor = (
-      <StickyContext className={controlClassName}>
+      <StickyContext className={controlClassName} registerListener={fn => this.updateStickyContext = fn}>
         <Button
           className={`${ styles.previewToggle } ${ previewVisible ? '' : styles.previewToggleShow }`}
           onClick={this.handleTogglePreview}
@@ -91,6 +91,7 @@ class EntryEditor extends Component {
             defaultSize="50%"
             onDragStarted={this.handleSplitPaneDragStart}
             onDragFinished={this.handleSplitPaneDragFinished}
+            onChange={this.updateStickyContext}
           >
             <ScrollSyncPane>{editor}</ScrollSyncPane>
             <div className={previewClassName}>
